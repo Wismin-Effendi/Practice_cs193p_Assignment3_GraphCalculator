@@ -13,6 +13,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var display: UILabel!
     
     var userIsInTheMiddleOfTyping = false
+    var dotHasBeenEntered = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,6 +23,13 @@ class ViewController: UIViewController {
 
     @IBAction func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
+        if digit == "." {
+            if dotHasBeenEntered {
+                return
+            }
+            dotHasBeenEntered = true
+        }
+        
         if userIsInTheMiddleOfTyping {
             let textCurrentlyInDisplay = display.text!
             display.text = textCurrentlyInDisplay + digit
@@ -47,6 +55,7 @@ class ViewController: UIViewController {
         if userIsInTheMiddleOfTyping {
             brain.setOperand(displayValue)
             userIsInTheMiddleOfTyping = false
+            dotHasBeenEntered = false 
         }
         
         if let mathematicalSymbol = sender.currentTitle {
