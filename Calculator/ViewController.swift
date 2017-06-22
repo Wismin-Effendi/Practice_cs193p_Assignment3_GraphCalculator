@@ -13,11 +13,23 @@ class ViewController: UIViewController {
     @IBOutlet weak var display: UILabel!
     @IBOutlet weak var history: UILabel!
     @IBOutlet weak var decimalSeparator: UIButton!
+    @IBOutlet weak var memoryKey: UIButton!
+    @IBOutlet weak var backSpace_Undo: UIButton!
     
-    var userIsInTheMiddleOfTyping = false
+    
+    var userIsInTheMiddleOfTyping = false {
+        didSet {
+            if userIsInTheMiddleOfTyping {
+                backSpace_Undo.setTitle("⬅️", for: .normal)
+            } else {
+                backSpace_Undo.setTitle("✘", for: .normal)
+            }
+        }
+    }
     
     private var brain = CalculatorBrain()
-    private var numberFormatter = NumberFormatter()
+    
+    private weak var numberFormatter: NumberFormatter! = CalculatorBrain.DoubleToString.numberFormatter
     
     var displayValue: Double {
         get {
@@ -40,8 +52,14 @@ class ViewController: UIViewController {
         brain.numberFormatter = numberFormatter
     }
     
+    
     @IBAction func backSpace(_ sender: UIButton) {
-        guard userIsInTheMiddleOfTyping else { return }
+        guard userIsInTheMiddleOfTyping else {
+            // acting as Undo button
+            undoTapped()
+            return
+        }
+        // acting as backspace button
         display.text = String(display.text!.characters.dropLast())
         if display.text?.characters.count == 0 {
             displayValue = 0.0
@@ -53,9 +71,28 @@ class ViewController: UIViewController {
         brain.clear()
         displayValue = 0.0
         history.text = " "
+        memoryKey.setTitle("M", for: .normal)
     }
     
+    
+    @IBAction func onMemory(_ sender: UIButton) {
+        if let key = sender.currentTitle {
+            if key == "→M" {
+                let variables = ["M": displayValue]
+                memoryKey.setTitle(display.text!, for: .normal)
+                evaluateExpression(using: variables)
+            } else {
+                brain.setOperand(variable: "M")
+                evaluateExpression()
+            }
+        }
+    }
 
+    private func undoTapped() {
+        _ = brain.undo()
+        evaluateExpression()
+    }
+    
     @IBAction func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         if userIsInTheMiddleOfTyping {
@@ -89,19 +126,22 @@ class ViewController: UIViewController {
             userIsInTheMiddleOfTyping = false
         }
         
-        print(brain.description)
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(mathematicalSymbol)
         }
-        
-        if let result = brain.result {
-            displayValue = result
-        }
-        let postfixDescription = brain.resultIsPending ? "..." : "="
-        history.text = brain.description + postfixDescription
+        evaluateExpression()
     }
     
-    
+
+    private func evaluateExpression(using variables: Dictionary<String,Double>? = nil) {
+        let evaluation = brain.evaluate(using: variables)
+        if let result = evaluation.result {
+            displayValue = result
+        }
+        userIsInTheMiddleOfTyping = false
+        let postfixDescription = evaluation.isPending ? "..." : "="
+        history.text = evaluation.description + postfixDescription
+    }
 
 }
 

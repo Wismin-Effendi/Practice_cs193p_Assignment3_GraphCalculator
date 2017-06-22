@@ -74,11 +74,11 @@
                                                         <rect key="frame" x="95" y="0.0" width="92.5" height="40.5"/>
                                                         <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                         <fontDescription key="fontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="22"/>
-                                                        <state key="normal" title="%">
+                                                        <state key="normal" title="1/x">
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                         </state>
                                                         <connections>
-                                                            <action selector="performOperation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="cIZ-yM-kQv"/>
+                                                            <action selector="performOperation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="lgw-jk-w6H"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZcQ-zh-OMT">
@@ -89,7 +89,7 @@
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                         </state>
                                                         <connections>
-                                                            <action selector="performOperation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="BfM-sJ-xKH"/>
+                                                            <action selector="onMemory:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ed3-aZ-6iv"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7fO-Vj-QQI">
@@ -100,7 +100,7 @@
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                         </state>
                                                         <connections>
-                                                            <action selector="performOperation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Tp8-xe-4QN"/>
+                                                            <action selector="onMemory:" destination="BYZ-38-t0r" eventType="touchUpInside" id="EVF-6U-Jh6"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6bR-8D-2nH">
@@ -347,7 +347,7 @@
                                                         <rect key="frame" x="0.0" y="0.0" width="93" height="40.5"/>
                                                         <color key="backgroundColor" red="0.50196081400000003" green="0.25098040700000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                                         <fontDescription key="fontDescription" name="AvenirNext-DemiBold" family="Avenir Next" pointSize="22"/>
-                                                        <state key="normal" title="1/x">
+                                                        <state key="normal" title="%">
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                         </state>
                                                         <connections>
@@ -440,9 +440,11 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="backSpace_Undo" destination="6bR-8D-2nH" id="AsN-hS-4hv"/>
                         <outlet property="decimalSeparator" destination="mto-aH-A1P" id="ZIb-ZU-l0N"/>
                         <outlet property="display" destination="fAh-lw-QqM" id="HCH-W8-QmF"/>
                         <outlet property="history" destination="Rl4-p4-OXw" id="9PV-wq-Ctu"/>
+                        <outlet property="memoryKey" destination="ZcQ-zh-OMT" id="yuh-pC-ZBM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
