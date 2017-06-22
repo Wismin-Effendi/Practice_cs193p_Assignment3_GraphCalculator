@@ -177,7 +177,7 @@ struct CalculatorBrain {
     }
 
     private var _didResetAccumulator: Bool = false
-    private var expression: [ExpressionLiteral] = []
+    fileprivate var expression: [ExpressionLiteral] = []
     
     private var formattedAccumulator: String? {
         if let number = accumulator {
@@ -187,7 +187,7 @@ struct CalculatorBrain {
         }
     }
     
-    private enum ExpressionLiteral {
+    fileprivate enum ExpressionLiteral {
         case operand(Operand)
         case operation(String)
         
@@ -205,7 +205,7 @@ struct CalculatorBrain {
         case equals
     }
     
-    private var operations: Dictionary<String,Operation> = [
+    fileprivate var operations: Dictionary<String,Operation> = [
         "π" : Operation.constant(Double.pi),
         "e" : Operation.constant(M_E),
         "√" : Operation.unaryOperation(sqrt),
@@ -240,6 +240,51 @@ struct CalculatorBrain {
             return function(firstOperand, secondOperand)
         }
     }
-    
+}
 
+// MARK: additional methods to support Graph
+extension CalculatorBrain {
+    func saveState(using key: String) {
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(program as AnyObject, forKey: key)
+    }
+    
+    mutating func loadState(using key: String) {
+        let userDefaults = UserDefaults.standard
+        if let stateToRestore = userDefaults.object(forKey: key) as? [AnyObject] {
+            program = stateToRestore
+        }
+    }
+    
+    fileprivate var program: [AnyObject] {
+        get {
+            var internalProgram: [AnyObject] = []
+            for literal in expression {
+                switch literal {
+                case .operation(let symbol): internalProgram.append(symbol as AnyObject)
+                case .operand(let operand):
+                    switch operand {
+                    case .value(let value): internalProgram.append(value as AnyObject)
+                    case .variable(let name): internalProgram.append(name as AnyObject)
+                    }
+                }
+            }
+            return internalProgram
+        }
+        set {
+            var expression: [ExpressionLiteral] = []
+            for property in newValue {
+                if let value = property as? Double {
+                    expression.append(.operand(.value(value)))
+                } else if let name = property as? String {
+                    if operations[name] != nil {
+                        expression.append(.operation(name))
+                    } else {
+                        expression.append(.operand(.variable(name)))
+                    }
+                }
+            }
+            self.expression = expression
+        }
+    }
 }

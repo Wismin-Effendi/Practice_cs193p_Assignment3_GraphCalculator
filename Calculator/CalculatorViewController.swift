@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  CalculatorViewController.swift
 //  Calculator
 //
 //  Created by Wismin Effendi on 6/14/17.
@@ -8,13 +8,14 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class CalculatorViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
     @IBOutlet weak var history: UILabel!
     @IBOutlet weak var decimalSeparator: UIButton!
     @IBOutlet weak var memoryKey: UIButton!
     @IBOutlet weak var backSpace_Undo: UIButton!
+    @IBOutlet weak var graphBarButtonItem: UIBarButtonItem!
     
     
     var userIsInTheMiddleOfTyping = false {
@@ -33,10 +34,32 @@ class ViewController: UIViewController {
     
     var displayValue: Double {
         get {
-            return Double(display.text!)!
+            guard let valueString = display.text else { return 0.0 }
+            let value = numberFormatter.number(from: valueString)
+            return Double(value ?? 0)
         }
         set {
             display.text = numberFormatter.string(from: newValue as NSNumber)
+            brain.saveState(using: Keys.stateOfCalculator)
+        }
+    }
+    
+    // stores dictionary containing variables. 
+    // Calculator sets just one variable, but to anticipate future use..
+    private var variables: [String: Double] {
+        get {
+            if let storedVariables = UserDefaults.standard.dictionary(forKey: Keys.variables) {
+                var variables: [String: Double] = [:]
+                for (key, value) in storedVariables {
+                    variables[key] = (value as? Double) ?? 0
+                }
+                return variables
+            } else {
+                return [:]
+            }
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: Keys.variables)
         }
     }
     
@@ -141,7 +164,43 @@ class ViewController: UIViewController {
         userIsInTheMiddleOfTyping = false
         let postfixDescription = evaluation.isPending ? "..." : "="
         history.text = evaluation.description + postfixDescription
+        graphBarButtonItem.tintColor = evaluation.isPending ? UIColor.gray : UIColor.blue
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        return !brain.evaluate().isPending
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        brain.saveState(using: Keys.stateOfGraphViewVC)
     }
 
 }
 
+extension CalculatorViewController: UISplitViewControllerDelegate {
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        
+        return true
+    }
+}
+
+extension CalculatorViewController {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.isHidden = traitCollection.verticalSizeClass == .compact
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        navigationController?.navigationBar.isHidden = traitCollection.horizontalSizeClass == .compact && traitCollection.verticalSizeClass == .regular
+    }
+}
+
+
+
+struct Keys {
+    static let stateOfGraphViewVC = "GraphViewControllerState"
+    static let stateOfCalculator = "CalculatorState"
+    static let variables = "CalculatorVariables"
+    static let segueToGraphVC = "segueToGraphVC"
+}
