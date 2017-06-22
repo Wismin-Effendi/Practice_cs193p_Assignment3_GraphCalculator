@@ -197,7 +197,7 @@ struct CalculatorBrain {
         }
     }
     
-    private enum Operation {
+    fileprivate enum Operation {
         case constant(Double)
         case unaryOperation((Double) -> Double)
         case binaryOperation((Double,Double) -> Double)
